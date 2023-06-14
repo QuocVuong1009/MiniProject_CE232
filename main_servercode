@@ -1,0 +1,65 @@
+from flask import Flask, render_template
+import paho.mqtt.client as mqtt
+import csv
+
+app = Flask(__name__)
+
+# MQTT broker configuration
+broker_address = 'mqtt.flespi.io'
+broker_port = 1883
+broker_username = 'moJruoiv8YC1nbgzW2ffeFNi4cnCwNyIZ7Xjj6ChS2834esO7yU91xhVxvnT8JpV'
+broker_password = ''
+topic = 'topic1'
+
+# MQTT client setup
+client = mqtt.Client()
+
+# Global variable to store the latest data
+latest_data = None
+
+def SaveToCSV(stringData):
+    with open('text_new_2.csv', mode='a', newline='', encoding='utf-8-sig') as file:
+        writer = csv.writer(file, delimiter=',', lineterminator='\n')
+        
+        if file.tell() == 0:
+            # Ghi header chỉ khi file rỗng
+            header = ['Nhiệt độ', 'Độ ẩm']
+            writer.writerow(header)
+        
+        nhiet_do = stringData[0:5]
+        do_am = stringData[5:10]
+        writer.writerow([nhiet_do, do_am])
+
+# MQTT event handlers
+def on_connect(client, userdata, flags, rc):
+    print('Connected to MQTT broker')
+    client.subscribe(topic)
+
+def on_message(client, userdata, msg):
+    global latest_data
+    payload = msg.payload.decode('utf-8')
+    print(f'Received message: {payload}')
+    latest_data = payload
+    SaveToCSV(latest_data)
+
+# Flask routes
+@app.route('/')
+def index():
+    return render_template('index1.html', data=latest_data)
+
+# Route to get the latest data via AJAX
+@app.route('/get_data')
+def get_data():
+    return latest_data
+
+if __name__ == '__main__':
+    # Connect to MQTT broker
+    client.username_pw_set(broker_username, broker_password)
+    client.on_connect = on_connect
+    client.on_message = on_message
+    client.connect(broker_address, broker_port, 60)
+    client.loop_start()
+
+    app.run()
+
+    client.loop_stop()

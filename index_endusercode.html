@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Function to update the data on the page
+        function updateData() {
+            $.ajax({
+                url: '/get_data',
+                success: function(response) {
+                    var data = response;
+                    var firstFourChars = data.slice(0, 5) + "°C";
+                    var remainingChars = data.slice(5) + "%";
+                    $('#part1').html(firstFourChars);
+                    $('#part2').html(remainingChars);
+                }
+            });
+        }
+        // Automatically update the data every 2 seconds
+        setInterval(updateData, 2000);
+    </script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .header {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1; /* Set z-index higher to make the header overlap the images */
+            color: rgb(237, 52, 23); 
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        .half {
+            width: 50%;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .half img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .circle-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background-color: rgb(109, 194, 244);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .circle p {
+            font-size: 48px;
+            font-weight: bold;
+            color: rgb(10, 10, 10);
+            margin: 10px 0;
+        }
+
+        .temperature-label,
+        .humidity-label {
+            font-size: 36px;
+            font-weight: bold;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>Trường đại học Công nghệ Thông tin</div>
+        <div>Thiết kế hệ thống nhúng không dây</div>
+        <div>Mini Project - Nhóm 3 - Lớp 2</div>
+    </div>
+    <div class="container">
+        <div class="half">
+            <img src="https://2.bp.blogspot.com/-iVfjGCAYnI4/Ud_q8hoMrII/AAAAAAAAK68/eoCXrGcRbCY/s1600/frio-icono-azul-termometro.png" alt="Bức ảnh 1">
+            <div class="circle-container">
+                <span class="temperature-label">Temperature</span>
+                <div class="circle">
+                    <p id="part1"></p>
+                </div>
+            </div>
+        </div>
+        <div class="half">
+            <img src="https://cms.iqair.com/sites/default/files/blog/2016-10/31_temperature_mobile.jpg" alt="Bức ảnh 2">
+            <div class="circle-container">
+                <span class="humidity-label">Humidity</span>
+                <div class="circle">
+                    <p id="part2"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
